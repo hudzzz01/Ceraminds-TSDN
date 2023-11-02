@@ -10,6 +10,14 @@ CORS(app)  # Menambahkan CORS ke aplikasi Flask
 UPLOAD_FOLDER = 'uploads'
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 
+#fungsi hapus file
+def hapus_file(nama_file):
+    try:
+        os.remove(nama_file)
+        return(f"File '{nama_file}' berhasil dihapus.")
+    except OSError as e:
+        return(f"Gagal menghapus file '{nama_file}': {e}")
+
 # Fungsi untuk mengambil daftar gambar yang sudah diunggah
 def get_uploaded_images():
     image_files = [f for f in os.listdir(UPLOAD_FOLDER) if os.path.isfile(os.path.join(UPLOAD_FOLDER, f))]
@@ -29,7 +37,17 @@ def analisa_text(text):
     except Exception as e:
         print(f"Terjadi kesalahan: {e}")
         return "Terjadi kesalahan: {e}"
-    
+
+@app.route('/')
+def home():
+    return jsonify({
+                "status" : "ok",
+                "message" : "it's work dude",
+                "data" : {
+            
+                }
+            }) 
+
 @app.route('/upload', methods=['POST', 'GET'])
 def upload_image():
     if request.method == 'POST':
@@ -69,6 +87,27 @@ def upload_image():
 def send_report(path):
     print(path)
     return send_from_directory('uploads', path)
+
+@app.route('/delete/<path:path>',methods=['DELETE'])
+def delete_image(path):
+    if request.method == "DELETE":
+        #print(path)
+        status = "ok"
+        result = hapus_file("uploads/"+path)
+        if result[0] == "G":
+            status = "error"
+        #print(result[0])
+    
+        
+    return jsonify({
+                "status" : status,
+                "message" : result,
+                "data" : {
+                    "nama_file" : path,
+                    "lokasi" : "/uploaded/"+path,
+                }
+            })
+
 
 if __name__ == '__main__':
     app.run(debug=True)
