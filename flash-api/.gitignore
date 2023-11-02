@@ -1,0 +1,17 @@
+# File dan direktori lingkungan virtual
+venv/
+env/
+
+# File bytecode Python
+*.pyc
+__pycache__/
+
+# File log
+*.log
+
+# File konfigurasi sensitif
+config.ini
+secrets.ini
+
+# Database (opsional)
+db.sqlite
