@@ -1,6 +1,9 @@
 # File dan direktori lingkungan virtual
 venv/
 env/
+myenv/
+myenv2/
+ceraminds/
 
 # File bytecode Python
 *.pyc
