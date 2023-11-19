@@ -5,6 +5,10 @@ import uuid
 import easyOcr
 import conn
 import sqlite3
+import fill
+from PIL import Image, ImageDraw
+
+box = []
 
 
 app = Flask(__name__)
@@ -83,7 +87,51 @@ def cek_db():
                 "data" : ""
             })   
     
-   
+@app.route('/covering/<path:path>', methods=['POST', 'GET'])
+def covering_image(path):
+    print(path)
+    if request.method == 'GET':
+        print("test")
+        try :
+             with sqlite3.connect("db/database.db") as con:
+                con.row_factory = sqlite3.Row
+                cur = con.cursor()
+                cur.execute("select * from photo where id='e840af32-7189-4db7-aacd-5988a215038e_asli.jpg")
+                rows = cur.fetchall()
+                print(rows)
+                print("Data get successfully")  
+                print("boxxx ",box)
+                return jsonify({
+                    "status" : "ok",
+                    "message" : "data berhasil di ambil",
+                    "data" : rows
+                })     
+        except sqlite3.Error as e:
+             print(f"Error: {e}")
+             return jsonify({
+                    "status" : "error",
+                    "message" : "data gagal di ambil",
+                    "data" : e
+                })     
+
+@app.route('/fillGambar', methods=['POST', 'GET'] )
+def fillImage():
+    if request.method == 'POST':
+        data = request.get_json()
+        path = "uploads/"+data["nama_file"]
+        
+        #nopal code
+        try:
+            print("boxx ",box)
+            out = fill.fillGambar(path,box)
+            return jsonify({"out": out})
+        except Exception as e:
+            print(e)
+            return jsonify({"err": e})
+            
+        
+        
+       
 
 @app.route('/analisaGambar', methods=['POST', 'GET'])
 def upload_image():
@@ -104,6 +152,7 @@ def upload_image():
             hasilBacaGambarUntukOcr = easyOcr.bacaGambar(path)
             #simpan ke db
             print("menyimpan bounding box <=:=> nama file")
+            box = hasilBacaGambarUntukOcr["box"]
             
             
             
@@ -129,7 +178,7 @@ def upload_image():
                     "nama_file" : newFileName,
                     "lokasi" : "/uploaded/"+newFileName,
                     "keterangan" : {
-                        "hasil_ocr " :  {
+                        "hasil_ocr" :  {
                             "found" : hasilBacaGambarUntukOcr["found"],
                             "text-smilar-data-pribadi" : hasilBacaGambarUntukOcr["text-smilar-data-pribadi"]    
                         },
@@ -182,4 +231,5 @@ def delete_image(path):
 
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    app.run(host='0.0.0.0', port=5000, debug=True)
+

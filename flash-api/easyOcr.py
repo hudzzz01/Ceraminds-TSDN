@@ -65,7 +65,7 @@ def bacaGambar(imgPath):
     return {
         'found': found,
         'text-smilar-data-pribadi' : smilar,
-        'box' : output
+        'box' : bounds
     }
 
 

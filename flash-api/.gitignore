@@ -17,4 +17,4 @@ config.ini
 secrets.ini
 
 # Database (opsional)
-db.sqlite
+
